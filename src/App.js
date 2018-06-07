@@ -1,18 +1,38 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
+import Tesseract from 'tesseract.js/dist/tesseract.js';
+// import logo from './logo.svg';
 import './App.css';
 
 class App extends Component {
+  state = {
+    processedText: {},
+  }
+
+  handleSubmitForm = (e) => {
+    e.preventDefault();
+    const t = this;
+    this.setState({ processedText: {} });
+    Tesseract.recognize(this.fileRef.files[0])
+    .catch(err => console.error("err----", err))
+    .then(function(result){
+        console.log("res---- ", result);
+        t.setState({
+          processedText: result,
+        });
+    })
+  }
+
   render() {
+    const { processedText } = this.state;
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
+        <form onSubmit={this.handleSubmitForm}>
+          <input ref={(ref) => (this.fileRef = ref)} type="file" name="rc-image" accept="image/*" />
+          <input type="submit" />
+        </form>
+        <div>
+          {processedText.text}
+        </div>
       </div>
     );
   }
